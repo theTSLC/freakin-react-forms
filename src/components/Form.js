@@ -1,5 +1,5 @@
 import React from 'react'
-// import validator from './validator';
+import validationRunner from './../helpers/validation/validationRunner';
 import normalizeModel from './../helpers/normalizeModel';
 import decorateInputs from './../helpers/decorateInputs'
 
@@ -7,34 +7,35 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     this.submitHandler = props.submitHandler;
-    this.disabled = props.disabled;
 
-    const eventHandler = {onChangeHandler: this.onChangeHandler.bind(this)};//, onBlurHandler: this.onBlurHandler(this)};
+    const eventHandler = {onChangeHandler: this.onChangeHandler.bind(this), onBlurHandler: this.onBlurHandler(this)};
     const fields = normalizeModel(props.model,{}, eventHandler);
-
 
     this.state = {
       fields,
       formIsValid: true
     };
+    this.newChildren = decorateInputs(this.props.children, this.state.fields);
+
   }
 
-  handleChange(fieldName, value) {
-
-    let field = this.state.fields.filter(x => x.name === fieldName)[0]
-    if(!field) {
+  handleChange(fieldName, value, change) {
+    let field = this.state.fields.filter(x => x.name === fieldName)[0];
+    if (!field) {
       return;
     }
-    field.value = value;
-    field.errors = []; //validator(this.state.fields, field);
+    if (change) {
+      field.value = value;
+    }
+    field.errors = validationRunner(field, this.state.fields);
     field.invalid = field.errors.length > 0;
-
-    let fields = this.state.fields.map(x => x.name === fieldName ? field : x);
-
-    this.setState({fields,
-      formIsValid:
-        this.state.fields.some(f => f.errors && f.errors.length > 0) })
-
+console.log('==========field.errors=========');
+console.log(field.errors);
+console.log('==========END field.errors=========');
+    this.setState({
+      fields: this.state.fields.map(x => x.name === fieldName ? field : x),
+      formIsValid: this.state.fields.some(f => f.errors && f.errors.length > 0)
+    })
   }
 
   generateNameValueModel() {
@@ -42,32 +43,29 @@ class Form extends React.Component {
   }
 
   onChangeHandler(e) {
+    return e.target ? this.handleChange(e.target.name, e.target.value, true) : null;
+  }
+
+  onBlurHandler(e) {
     return e.target ? this.handleChange(e.target.name, e.target.value) : null;
-    }
+  }
 
-  // onBlurHandler(obj) {
-  //   return (fieldName) => (e) => {
-  //     console.log('==========e=========');
-  //     console.log(e.target.value);
-  //     console.log('==========END e=========');
-  //
-  //     return obj.handleChange(fieldName, e.target.value)
-  //   }
-  // }
-
-  onSubmitHandler() {
-    // if(validator(this.state.fields).length <= 0){
+  onSubmitHandler(e) {
+    e.preventDefault();
+    const errors = validationRunner(this.state.fields);
+    if( errors && errors.length <= 0){
     // this.submitHandler(this.generateNameValueModel());
-    alert(JSON.stringify(this.generateNameValueModel()));
-    // }
+      alert(JSON.stringify(this.generateNameValueModel()));
+    }else{
+      alert(JSON.stringify(errors));
+    }
   }
 
 
   render() {
-   const  newChildren = decorateInputs(this.props.children, this.state.fields);
 
-    return (<form onSubmit={this.onSubmitHandler} disabled={this.disabled || false} >
-      {newChildren}
+    return (<form onSubmit={this.onSubmitHandler.bind(this)} >
+      {this.newChildren}
     </form>)
   }
 }

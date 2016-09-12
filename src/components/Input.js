@@ -5,16 +5,14 @@ import React from 'react';
 import Select from 'react-select';
 // import uuid from 'uuid';
 
-const _Input = ({data}) => {
+const _Input = ({data, containerStyle, dispatch}) => {
 
-  let _label = propToLabel(data.label || data.name);
-  let _placeholder = propToLabel(data.placeholder || data.label);
   let validationState = data.isvalid ?  'input__success' : 'input__error';
   let style = 'input__container__' + (data.type ? data.type : 'input') + ' ' + validationState;
-  // let val = property.touched && property.error ? property.error : ' ';
-  // let valStyle = property.touched && property.error
-  //   ? 'input__container__validation__error'
-  //   : 'input__container__validation__success';
+  let val = data.errors.length > 0 ? data.error : '';
+  let valStyle = data.errors.length > 0
+    ? 'input__container__validation__error'
+    : 'input__container__validation__success';
   // let validationEl = null;
   // switch (validation) {
   //   case 'inline': {
@@ -24,19 +22,20 @@ const _Input = ({data}) => {
   //   }
   //   case 'top':
   //   default: {
-  //     if (property.touched && property.error) {
+  //     if (data.errors.length > 0) {
   //       dispatch(notifSend({
-  //         id: property.name,
-  //         message: property.error,
+  //         id: data.name,
+  //         message: data.error,
   //         kind: 'danger'
   //       }));
-  //     } else if (property.touched && property.dirty && !property.error) {
-  //       dispatch(notifDismiss(property.name));
+  //       // get state of notifications to determine if we should dispatch
+  //     } else if (!data.error) {
+  //       dispatch(notifDismiss(data.name));
   //     }
   //   }
   // }
 
-  const _containerStyle = '';// containerStyle ? containerStyle : '';
+  // const _containerStyle = containerStyle ? containerStyle : '';
 
   const input = function() {
     switch(data.type){
@@ -48,13 +47,18 @@ const _Input = ({data}) => {
       }
       default:
       case 'input': {
-        return (<input className={style} type={data.type ? data.type : 'text'}  placeholder={_placeholder} {...data} />)
+        return (<input className={style}
+                       type={data.type ? data.type : 'text'}
+                       placeholder={data.placeholder}
+                       name={data.name}
+                       onChange={data.onChange}
+           />)
       }
     }
   };
 
-  return (<div className={"input__container " + _containerStyle} >
-    <label className="input__container__label" htmlFor={data.name}>{_label}</label>
+  return (<div className={"input__container "} >
+    <label className="input__container__label" htmlFor={data.name}>{data.label}</label>
     {input()}
     {/*{validationEl}*/}
   </div>);
@@ -63,11 +67,5 @@ const _Input = ({data}) => {
 export default _Input;
 
 
-const propToLabel = function(val) {
-  return val ? val.replace(/([A-Z])/g, ' $1')
-  // uppercase the first character
-    .replace(/^./, function(str) {
-      return str.toUpperCase();
-    }) : val;
-};
+
 

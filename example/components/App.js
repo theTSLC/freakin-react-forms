@@ -8,7 +8,8 @@ export default () => {
     {
       type: 'text',
       name: 'userName',
-      label: 'User Name'
+      label: 'User Name',
+      rules: [{rule:'required'}]
     },
     {
       type: 'password',
@@ -20,7 +21,7 @@ export default () => {
     <Form model={model} >
       <div><Input frfProperty="userName" /></div>
       <div><Input frfProperty="password" /></div>
-      <button type="submit" value="submit" >submit</button>
+      <input type="submit" value="submit"></input>
       </Form>
   </div>);
 };
