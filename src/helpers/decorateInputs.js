@@ -2,22 +2,24 @@ import React from 'react';
 
 const decorateInput = (children, model) => {
   return React.Children.map(children, x => {
-    if (x.props.property) {
-      var modelProperty = model.filter(f => f.name === x.props.property);
-      if (modelProperty.length <= 0) {
-        throw new Error(`No property on model with name: ${x.property}!`)
+console.log('==========x=========');
+console.log(x);
+console.log('==========END x=========');
+
+    if (x.props && x.props.frfProperty) {
+      var modelProperty = model.filter(f => f.name === x.props.frfProperty)[0];
+      if (!modelProperty) {
+        throw new Error(`No property on model with name: ${x.frfProperty}!`)
       }
-      console.log('==========modelProperty=========');
-      console.log(modelProperty);
-      console.log('==========END modelProperty=========');
-      var newX = React.cloneElement(x, {data: modelProperty})
-      console.log('==========newX=========');
-      console.log(newX);
-      console.log('==========END newX=========');
-      return newX;
-    } else {
-      return decorateInput(x.props.children, model);
+      // modelProperty.onBlur = modelProperty.onBlur(modelProperty.name);
+      return React.cloneElement(x, {data: modelProperty});
     }
+    if(!x.props){
+      return x;
+    }
+    var clonedItems = decorateInput(x.props.children, model);
+    return React.cloneElement(x, {children: clonedItems});
+
   })
 };
 

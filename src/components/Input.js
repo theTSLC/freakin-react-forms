@@ -1,0 +1,73 @@
+import React from 'react';
+// import propToLabel from './../../utilities/propToLabel';
+// import {actions as notifActions} from 'redux-notifications';
+// const {notifSend, notifDismiss} = notifActions;
+import Select from 'react-select';
+// import uuid from 'uuid';
+
+const _Input = ({data}) => {
+
+  let _label = propToLabel(data.label || data.name);
+  let _placeholder = propToLabel(data.placeholder || data.label);
+  let validationState = data.isvalid ?  'input__success' : 'input__error';
+  let style = 'input__container__' + (data.type ? data.type : 'input') + ' ' + validationState;
+  // let val = property.touched && property.error ? property.error : ' ';
+  // let valStyle = property.touched && property.error
+  //   ? 'input__container__validation__error'
+  //   : 'input__container__validation__success';
+  // let validationEl = null;
+  // switch (validation) {
+  //   case 'inline': {
+  //     // if you use inline you'll need to adjust the height of the input container
+  //     validationEl = (<div className={valStyle}>{val}</div>);
+  //     break;
+  //   }
+  //   case 'top':
+  //   default: {
+  //     if (property.touched && property.error) {
+  //       dispatch(notifSend({
+  //         id: property.name,
+  //         message: property.error,
+  //         kind: 'danger'
+  //       }));
+  //     } else if (property.touched && property.dirty && !property.error) {
+  //       dispatch(notifDismiss(property.name));
+  //     }
+  //   }
+  // }
+
+  const _containerStyle = '';// containerStyle ? containerStyle : '';
+
+  const input = function() {
+    switch(data.type){
+      case 'select': {
+        return (<Select className={style} options={data.selectOptions} {...data} />)
+      }
+      case 'multi-select': {
+        return (<Select className={style} options={data.selectOptions} {...data}  multi={true} />);
+      }
+      default:
+      case 'input': {
+        return (<input className={style} type={data.type ? data.type : 'text'}  placeholder={_placeholder} {...data} />)
+      }
+    }
+  };
+
+  return (<div className={"input__container " + _containerStyle} >
+    <label className="input__container__label" htmlFor={data.name}>{_label}</label>
+    {input()}
+    {/*{validationEl}*/}
+  </div>);
+};
+
+export default _Input;
+
+
+const propToLabel = function(val) {
+  return val ? val.replace(/([A-Z])/g, ' $1')
+  // uppercase the first character
+    .replace(/^./, function(str) {
+      return str.toUpperCase();
+    }) : val;
+};
+

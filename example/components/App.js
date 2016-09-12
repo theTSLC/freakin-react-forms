@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from '../../src/components/Form';
+import Input from '../../src/components/Input';
 
 export default () => {
 
@@ -17,8 +18,9 @@ export default () => {
   ];
   return (<div className="redux__datatable__app" >
     <Form model={model} >
-      <div><input property="userName" /></div>
-      <div><input property="password" /></div>
+      <div><Input frfProperty="userName" /></div>
+      <div><Input frfProperty="password" /></div>
+      <button type="submit" value="submit" >submit</button>
       </Form>
   </div>);
 };

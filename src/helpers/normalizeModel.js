@@ -7,10 +7,12 @@ const normalizeModel = (model, data, events) => {
         type: x.type,
         name: x.name,
         label: x.label,
-        validators: x.validators,
-        value: data[x.name],
+        validators: x.validators ,
+        value: data[x.name] || '',
         onChange: events.onChangeHandler,
-        onBlur: events.onBlurHandler
+        onBlur: events.onBlurHandler,
+        errors: [],
+        invalid: false
       }
   })
 };
