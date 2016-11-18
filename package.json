@@ -7,7 +7,7 @@
     "start": "webpack-dev-server --progress --config ./webpack.config.js",
     "build": "webpack --config ./webpack.build.config.js --progress",
     "test": "NODE_ENV=test mocha -w --recursive --compilers js:babel-core/register ./tests/**/*",
-    "testOnce": "NODE_ENV=test mocha --recursive --compilers js:babel-core/register ./app/tests/**",
+    "testOnce": "NODE_ENV=test mocha --recursive --compilers js:babel-core/register ./tests/**/*",
     "lint": "eslint .",
     "validate": "npm ls",
     "esw": "esw -w --color"
@@ -30,6 +30,7 @@
     "mocha": "^3.1.2",
     "postcss-import": "^8.1.2",
     "postcss-loader": "^0.9.1",
+    "precommit-hook-eslint": "^3.0.0",
     "precss": "^1.4.0",
     "react-select": "^1.0.0-rc.1",
     "redux-devtools": "^3.3.1",
@@ -48,6 +49,12 @@
     "redux": "^3.5.2",
     "redux-logger": "^2.6.1",
     "selectn": "^1.1.1",
-    "uuid": "^2.0.3"
-  }
+    "uuid": "^2.0.3",
+    "precommit-hook-eslint": "^3.0.0"
+  },
+  "pre-commit": [
+    "validate",
+    "lint",
+    "testOnce"
+  ]
 }

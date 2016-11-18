@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { PropTypes } from 'react';
 import validationRunner from './../helpers/validation/validationRunner';
 import normalizeModel from './../helpers/normalizeModel';
-import decorateInputs from './../helpers/decorateInputs'
+import decorateInputs from './../helpers/decorateInputs';
 
 class Form extends React.Component {
   constructor(props) {
@@ -10,8 +10,8 @@ class Form extends React.Component {
     this.eventHandler = {onChangeHandler: this.onChangeHandler.bind(this), onBlurHandler: this.onBlurHandler(this)};
   }
 
-  componentWillMount(){
-    const fields = normalizeModel(this.props,  this.eventHandler);
+  componentWillMount() {
+    const fields = normalizeModel(this.props, this.eventHandler);
 
     this.state = {
       fields,
@@ -19,7 +19,7 @@ class Form extends React.Component {
     };
   }
 
-  componentWillReceiveProps(newProps){
+  componentWillReceiveProps(newProps) {
     const fields = normalizeModel(newProps, this.eventHandler);
 
     this.state = {
@@ -67,7 +67,7 @@ class Form extends React.Component {
     e.preventDefault();
     this.errors = [];
     const fields = this.state.fields;
-    var newFieldsState = Object.keys(fields).map(x => {
+    let newFieldsState = Object.keys(fields).map(x => {
       fields[x].errors = this.validateField(fields[x], this.state.fields);
       this.errors = this.errors.concat(fields[x].errors);
       return fields[x];
@@ -85,8 +85,14 @@ class Form extends React.Component {
     this.newChildren = decorateInputs(this.props.children, this.state.fields);
     return (<form onSubmit={this.onSubmitHandler.bind(this)} >
       {this.newChildren}
-    </form>)
+    </form>);
   }
 }
+
+
+Form.propTypes = {
+  children: PropTypes.array,
+  submitHandler: PropTypes.func.required
+};
 
 export default Form;

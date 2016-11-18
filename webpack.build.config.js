@@ -20,20 +20,20 @@ const webpackConfig = {
   },
 
   externals: {
-    "react":"react",
-    "react-dom":"react-dom",
-    "react-hot-loader":"react-hot-loader",
+    react: 'react',
+    'react-dom': 'react-dom',
+    'react-hot-loader': 'react-hot-loader'
   },
 
   module: {
     loaders: [
-      { test: /\.jsx?$/, include: [ path.resolve(__dirname, 'src')], loader: 'babel'},
+      { test: /\.jsx?$/, include: [ path.resolve(__dirname, 'src')], loader: 'babel'}
     ]
   },
 
   plugins: [
     //see possible syntax errors at the browser console instead of hmre overlay
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoErrorsPlugin()
   ],
 
   resolve: {
