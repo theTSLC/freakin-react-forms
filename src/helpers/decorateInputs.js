@@ -1,16 +1,23 @@
 import React from 'react';
+import selectn from 'selectn';
 
 const decorateInput = (children, model) => {
   return React.Children.map(children, x => {
     if(!x.props){ return x; }
-    if (x.props.frfProperty) {
-      var modelProperty = model.filter(f => f.name === x.props.frfProperty)[0];
-      if (!modelProperty) {
-        throw new Error(`No property on model with name: ${x.frfProperty}!`)
+      const property = model[selectn('frfProperty.name', x.props)];
+      if (property) {
+        if (typeof property != 'object') {
+          throw new Error(`No property on model with name: ${x.frfProperty}!`)
+        }
+        // so if your Inputs are redux containers, they will not rerender if the top level properties
+        // of "modelProperty" have not changed, since we are changing the deeper values, we need a
+        // couple hacks here (dataVal and rerenderHack) to trigger a rerender if those props have changed
+        return React.cloneElement(x, {
+          data: property,
+          dataVal: property.value,
+          rerenderHack: property.errors.length > 0 ? property.errors : undefined
+        });
       }
-      return React.cloneElement(x, {data: modelProperty});
-    }
-
     var clonedItems = decorateInput(x.props.children, model);
     return React.cloneElement(x, {children: clonedItems});
   })

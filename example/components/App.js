@@ -1,6 +1,6 @@
 import React from 'react';
 import Form from '../../src/components/Form';
-import Input from '../../src/components/Input';
+import Input from './Input';
 
 export default () => {
 
@@ -9,7 +9,8 @@ export default () => {
       type: 'text',
       name: 'userName',
       label: 'User Name',
-      rules: [{rule:'required'}]
+      rules: [{rule:'required'}],
+      customAttr: 'this is a custom attr'
     },
     {
       type: 'password',

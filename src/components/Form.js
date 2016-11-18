@@ -7,39 +7,52 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     this.submitHandler = props.submitHandler;
+    this.eventHandler = {onChangeHandler: this.onChangeHandler.bind(this), onBlurHandler: this.onBlurHandler(this)};
+  }
 
-    const eventHandler = {onChangeHandler: this.onChangeHandler.bind(this), onBlurHandler: this.onBlurHandler(this)};
-    const fields = normalizeModel(props.model,{}, eventHandler);
+  componentWillMount(){
+    const fields = normalizeModel(this.props,  this.eventHandler);
 
     this.state = {
       fields,
       formIsValid: true
     };
-    this.newChildren = decorateInputs(this.props.children, this.state.fields);
-
   }
 
+  componentWillReceiveProps(newProps){
+    const fields = normalizeModel(newProps, this.eventHandler);
+
+    this.state = {
+      fields,
+      formIsValid: true
+    };
+  }
+
+  validateField(field, fields) { return validationRunner(field, fields); }
+
   handleChange(fieldName, value, change) {
-    let field = this.state.fields.filter(x => x.name === fieldName)[0];
+    const fields = this.state.fields;
+    let field = fields[Object.keys(fields).filter(x => fields[x].name === fieldName)[0]];
     if (!field) {
       return;
     }
     if (change) {
       field.value = value;
     }
-    field.errors = validationRunner(field, this.state.fields);
+    field.errors = this.validateField(field, fields);
+
     field.invalid = field.errors.length > 0;
-console.log('==========field.errors=========');
-console.log(field.errors);
-console.log('==========END field.errors=========');
     this.setState({
-      fields: this.state.fields.map(x => x.name === fieldName ? field : x),
-      formIsValid: this.state.fields.some(f => f.errors && f.errors.length > 0)
-    })
+      fields: Object.keys(fields)
+        .map(x => fields[x].name === fieldName ? field : fields[x])
+        .reduce((x, y) =>{ x[y.name] = y; return x; }, {}),
+      formIsValid: Object.keys(fields).some(f => fields[f].errors && fields[f].errors.length > 0)
+    });
   }
 
   generateNameValueModel() {
-    return this.state.fields.reduce((x, y) =>{ x[y.name] = y.value; return x; }, {});
+    const fields = this.state.fields;
+    return Object.keys(fields).reduce((x, y) =>{ x[y] = fields[y].value; return x; }, {});
   }
 
   onChangeHandler(e) {
@@ -52,18 +65,24 @@ console.log('==========END field.errors=========');
 
   onSubmitHandler(e) {
     e.preventDefault();
-    const errors = validationRunner(this.state.fields);
-    if( errors && errors.length <= 0){
-    // this.submitHandler(this.generateNameValueModel());
-      alert(JSON.stringify(this.generateNameValueModel()));
-    }else{
-      alert(JSON.stringify(errors));
+    this.errors = [];
+    const fields = this.state.fields;
+    var newFieldsState = Object.keys(fields).map(x => {
+      fields[x].errors = this.validateField(fields[x], this.state.fields);
+      this.errors = this.errors.concat(fields[x].errors);
+      return fields[x];
+    });
+
+    this.setState({fields: newFieldsState, formIsValid: this.errors.length <= 0, errors: this.errors});
+    if (this.errors.length <= 0) {
+      this.submitHandler(this.generateNameValueModel());
     }
   }
 
-
   render() {
-
+    // I have moved this down to render, as it is necessary when using "connect"ed inputs from redux
+    // also superficial evidence is that it does not affect the number of time decorate is called
+    this.newChildren = decorateInputs(this.props.children, this.state.fields);
     return (<form onSubmit={this.onSubmitHandler.bind(this)} >
       {this.newChildren}
     </form>)
